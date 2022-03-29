@@ -9,7 +9,8 @@
     "start:dev": "nodemon",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "Juan Pablo Tyrlik",
@@ -29,6 +30,7 @@
     "@typescript-eslint/eslint-plugin": "^5.17.0",
     "@typescript-eslint/parser": "^5.17.0",
     "eslint": "^8.12.0",
+    "husky": "^7.0.4",
     "jest": "^27.5.1",
     "nodemon": "^2.0.15",
     "ts-node": "^10.7.0",
