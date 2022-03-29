@@ -1,0 +1,9 @@
+# App
+node_modules
+
+# DB
+.data
+
+# Configs
+.env
+.vscode
