@@ -1,14 +1,13 @@
-import cors from 'cors';
-import express, { Request, Response } from 'express';
+import express from 'express';
+import { setupDatabase } from './config/db';
+import { setupMiddlewares } from './middlewares/middlewares';
+import { setupRoutes } from './routes/routes';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
-});
+setupMiddlewares(app);
+setupRoutes(app);
+setupDatabase();
 
 app.listen(process.env.PORT, () => {
   console.log(`Listening on port ${process.env.PORT}`);
