@@ -7,3 +7,6 @@ node_modules
 # Configs
 .env
 .vscode
+
+# Logs
+*.log

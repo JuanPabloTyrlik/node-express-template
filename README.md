@@ -10,3 +10,4 @@ Includes:
 - Jest
 - Env Variables
 - Pre-commit Hooks
+- Logging

@@ -1,9 +1,10 @@
 import express from 'express';
 import 'reflect-metadata';
 import { setupDatabase } from './config/db';
+import { logger } from './lib/logger/logger';
 import {
   setupErrorHandlers,
-  setupMiddlewares,
+  setupMiddlewares
 } from './middlewares/middlewares';
 import { setupRoutes } from './routes/routes';
 
@@ -15,5 +16,5 @@ setupRoutes(app);
 setupErrorHandlers(app);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Listening on port ${process.env.PORT}`);
+  logger.info({context: 'Application', message: `Listening on port ${process.env.PORT}`});
 });
