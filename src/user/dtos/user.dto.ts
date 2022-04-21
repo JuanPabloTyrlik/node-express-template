@@ -1,12 +1,16 @@
+import { Expose } from 'class-transformer';
 import { IsEmail, IsString } from 'class-validator';
 
 export class User {
+  @Expose()
   @IsString()
-  public firstName: string;
+  firstName: string;
 
+  @Expose()
   @IsString()
-  public lastName: string;
+  lastName: string;
 
+  @Expose()
   @IsEmail()
-  public email: string;
+  email: string;
 }

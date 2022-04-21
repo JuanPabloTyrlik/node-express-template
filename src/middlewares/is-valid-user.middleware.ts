@@ -1,5 +1,7 @@
+import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
+import { HttpStatus } from '../enums/http-status.enum';
 import { User } from '../user/dtos/user.dto';
 
 export const isValidUserMiddleware = async (
@@ -7,16 +9,14 @@ export const isValidUserMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user = new User();
+  const user = plainToInstance(User, req.body ?? {}, {
+    excludeExtraneousValues: true,
+  });
 
-  user.firstName = req.body.firstName;
-  user.lastName = req.body.lastName;
-  user.email = req.body.email;
-
-  const errors = await validate(user);
+  const errors = await validate(user, { whitelist: true });
 
   if (errors.length) {
-    return res.status(400).json({ errors });
+    return res.status(HttpStatus.BAD_REQUEST).json({ errors });
   }
 
   next();

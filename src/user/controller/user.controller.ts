@@ -1,14 +1,16 @@
 import { ObjectId } from 'bson';
-import { Request, Response, Router } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { NextFunction, Request, Response, Router } from 'express';
+import { HttpStatus } from '../../enums/http-status.enum';
 import { isValidIdMiddleware } from '../../middlewares/is-valid-id.middleware';
 import { isValidUserMiddleware } from '../../middlewares/is-valid-user.middleware';
-import { UserNotFoundException } from '../exceptions/user-not-found.exception';
+import { User } from '../dtos/user.dto';
 import { UserService } from '../services/user.service';
 
 export const userRouter = Router();
 const userService = UserService.getInstance();
 
-userRouter.get('/', async (req: Request, res: Response) => {
+userRouter.get('/', async (_: Request, res: Response) => {
   const users = await userService.getUsers();
 
   return res.json({ users });
@@ -17,16 +19,15 @@ userRouter.get('/', async (req: Request, res: Response) => {
 userRouter.get(
   '/:id',
   isValidIdMiddleware,
-  async (req: Request, res: Response) => {
-    const userId = new ObjectId(req.params.id);
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = new ObjectId(req.params.id);
+
       const user = await userService.getUser(userId);
 
-      return res.json(user);
+      res.json(user);
     } catch (error) {
-      if (error instanceof UserNotFoundException)
-        return res.status(404).json({ message: 'The user was not found' });
-      throw error;
+      next(error);
     }
   }
 );
@@ -34,28 +35,36 @@ userRouter.get(
 userRouter.post(
   '/',
   isValidUserMiddleware,
-  async (req: Request, res: Response) => {
-    const userData = req.body;
-    const user = await userService.createUser(userData);
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userData = plainToInstance(User, req.body, {
+        excludeExtraneousValues: true,
+      });
 
-    return res.status(201).json(user);
+      const user = await userService.createUser(userData);
+
+      return res.status(HttpStatus.CREATED).json(user);
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
 userRouter.put(
   '/:id',
   [isValidIdMiddleware, isValidUserMiddleware],
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = new ObjectId(req.params.id);
-      const userData = req.body;
+      const userData = plainToInstance(User, req.body, {
+        excludeExtraneousValues: true,
+      });
+
       const user = await userService.updateUser(userId, userData);
 
       return res.json(user);
     } catch (error) {
-      if (error instanceof UserNotFoundException)
-        return res.status(404).json({ message: 'The user was not found' });
-      throw error;
+      next(error);
     }
   }
 );
@@ -63,16 +72,15 @@ userRouter.put(
 userRouter.delete(
   '/:id',
   isValidIdMiddleware,
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = new ObjectId(req.params.id);
+
       await userService.deleteUser(userId);
 
-      return res.status(204).send();
+      return res.status(HttpStatus.NO_CONTENT).send();
     } catch (error) {
-      if (error instanceof UserNotFoundException)
-        return res.status(404).json({ message: 'The user was not found' });
-      throw error;
+      next(error);
     }
   }
 );

@@ -1,11 +1,18 @@
 import cors from 'cors';
-import { Application, json, Request, Response } from 'express';
+import { Application, json, NextFunction, Request, Response } from 'express';
+import { HttpStatus } from '../enums/http-status.enum';
+import { HttpException } from '../exceptions/http.exception';
 
 export const setupMiddlewares = (app: Application) => {
   app.use(cors());
   app.use(json());
-  app.use((err: Error, _: Request, res: Response) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+};
+
+export const setupErrorHandlers = (app: Application) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: HttpException, _: Request, res: Response, __: NextFunction) => {
+    res
+      .status(err.statusCode ?? HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
   });
 };

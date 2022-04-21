@@ -1,5 +1,6 @@
 import { isMongoId } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
+import { HttpStatus } from '../enums/http-status.enum';
 
 export const isValidIdMiddleware = (
   req: Request,
@@ -9,7 +10,9 @@ export const isValidIdMiddleware = (
   const { id } = req.params;
 
   if (!isMongoId(id)) {
-    return res.status(400).json({ message: `${id} is not a MongoId` });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ message: `${id} is not a MongoId` });
   }
 
   next();
